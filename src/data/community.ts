@@ -13,6 +13,7 @@ export type ResidentProfile = {
   interests: string[]
   sourceLabel?: string
   profileUrl?: string
+  imageUrl?: string
   links?: ProfileLink[]
   dataFilled?: boolean
 }
@@ -28,6 +29,7 @@ type ResidentSeed = {
   apartments: string[]
   sourceLabel: string
   profileUrl?: string
+  imageUrl?: string
   work: string
   detail: string
   interests: string[]
@@ -90,6 +92,7 @@ const residentSeeds: ResidentSeed[] = [
     apartments: ['311'],
     sourceLabel: 'YC profile',
     profileUrl: 'https://www.ycombinator.com/companies/gigacatalyst',
+    imageUrl: 'https://nmn.gl/img/nmn-headshot-2025.jpeg',
     work: 'Founder & CEO at Gigacatalyst',
     detail: 'YC Spring 2026 founder building an embedded AI customization layer that lets B2B SaaS customers create missing workflows inside existing products.',
     interests: ['enterprise AI', 'B2B SaaS', 'product customization', 'YC'],
@@ -189,6 +192,7 @@ const residentSeeds: ResidentSeed[] = [
     apartments: ['213'],
     sourceLabel: 'YC profile',
     profileUrl: 'https://www.ycombinator.com/companies/ramain',
+    imageUrl: 'https://github.com/SveeJ.png',
     work: 'Co-Founder & CEO at RamAIn',
     detail: 'YC Winter 2026 founder building enterprise computer-use agents that automate repetitive browser and desktop workflows through UI interaction.',
     interests: ['computer-use agents', 'UI automation', 'enterprise workflows', 'YC'],
@@ -260,6 +264,7 @@ const residentSeeds: ResidentSeed[] = [
     apartments: ['261'],
     sourceLabel: 'YC profile',
     profileUrl: 'https://www.ycombinator.com/companies/helonic',
+    imageUrl: 'https://github.com/milinds2403.png',
     work: 'Founder at Articulate / Helonic',
     detail: 'YC Fall 2025 founder building AI construction drawing analysis to detect clashes, callouts, discrepancies, and draft RFIs before field rework.',
     interests: ['construction AI', 'drawing analysis', 'RFIs', 'YC'],
@@ -605,6 +610,7 @@ export const residentProfiles: ResidentProfile[] = residentSeeds.flatMap((seed) 
     interests: seed.interests,
     sourceLabel: seed.sourceLabel,
     profileUrl: seed.profileUrl,
+    imageUrl: seed.imageUrl,
     links: seed.links,
     dataFilled: true,
   })),

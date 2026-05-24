@@ -225,6 +225,25 @@ function ProfileLinkButton({ link, unitId }: { link: ProfileLink; unitId: string
   )
 }
 
+function ResidentAvatar({ resident }: { resident: ResidentProfile }) {
+  const [imageFailed, setImageFailed] = useState(false)
+
+  if (resident.imageUrl && !imageFailed) {
+    return (
+      <div className="avatar photo-avatar">
+        <img
+          alt=""
+          aria-hidden="true"
+          onError={() => setImageFailed(true)}
+          src={resident.imageUrl}
+        />
+      </div>
+    )
+  }
+
+  return <div className="avatar">{getInitials(resident.names)}</div>
+}
+
 function isUnitSearchMatch(
   floor: Floor,
   unit: MapUnit,
@@ -1051,10 +1070,23 @@ function App() {
             {selectedResident ? (
               <>
                 <div className="profile-header">
-                  <div className="avatar">{getInitials(selectedResident.names)}</div>
-                  <div>
+                  <ResidentAvatar resident={selectedResident} />
+                  <div className="profile-heading">
                     <h3>{selectedResident.names}</h3>
                     <p>{selectedResident.work}</p>
+                    {selectedResident.links?.length ? (
+                      <section className="research-links" aria-label="Profile links">
+                        <div className="research-link-grid">
+                          {selectedResident.links.map((link) => (
+                            <ProfileLinkButton
+                              key={`${selectedResident.unitId}-${link.url}`}
+                              link={link}
+                              unitId={selectedResident.unitId}
+                            />
+                          ))}
+                        </div>
+                      </section>
+                    ) : null}
                   </div>
                 </div>
 
@@ -1066,19 +1098,6 @@ function App() {
                   ))}
                 </div>
 
-                {selectedResident.links?.length ? (
-                  <section className="research-links" aria-label="Profile links">
-                    <div className="research-link-grid">
-                      {selectedResident.links.map((link) => (
-                        <ProfileLinkButton
-                          key={`${selectedResident.unitId}-${link.url}`}
-                          link={link}
-                          unitId={selectedResident.unitId}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                ) : null}
               </>
             ) : (
               <div className="empty-profile">
