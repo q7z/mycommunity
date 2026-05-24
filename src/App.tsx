@@ -222,6 +222,7 @@ function isUnitSearchMatch(
     resident?.nextMove,
     resident?.preferredContact,
     ...(resident?.interests ?? []),
+    ...(resident?.links?.flatMap((link) => [link.label, link.detail, link.url]) ?? []),
     availability?.displayUnitNumber,
     availability?.displayArea,
     availability?.displayPrice,
@@ -1096,6 +1097,26 @@ function App() {
                 </dl>
 
                 <p className="profile-note">{selectedResident.note}</p>
+
+                {selectedResident.links?.length ? (
+                  <section className="drawer-section research-links" aria-label="Founder research links">
+                    <div className="panel-title">
+                      <ExternalLink size={17} aria-hidden="true" />
+                      <span>Research Links</span>
+                    </div>
+                    <div className="research-link-grid">
+                      {selectedResident.links.map((link) => (
+                        <a href={link.url} key={`${selectedResident.unitId}-${link.url}`} target="_blank" rel="noreferrer">
+                          <strong>
+                            {link.label}
+                            <ExternalLink size={13} aria-hidden="true" />
+                          </strong>
+                          <span>{link.detail}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
 
                 <div className="tag-list">
                   {selectedResident.interests.map((interest) => (

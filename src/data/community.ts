@@ -13,7 +13,14 @@ export type ResidentProfile = {
   interests: string[]
   sourceLabel?: string
   profileUrl?: string
+  links?: ProfileLink[]
   dataFilled?: boolean
+}
+
+export type ProfileLink = {
+  label: string
+  url: string
+  detail: string
 }
 
 type ResidentSeed = {
@@ -26,6 +33,7 @@ type ResidentSeed = {
   interests: string[]
   relationship?: number
   stage?: ResidentProfile['stage']
+  links?: ProfileLink[]
 }
 
 const unitIdsByApartment: Record<string, string> = {
@@ -80,66 +88,209 @@ const residentSeeds: ResidentSeed[] = [
   {
     names: 'Namanyay Goel',
     apartments: ['311'],
-    sourceLabel: 'View Profile',
-    profileUrl: 'https://nmn.gl/',
+    sourceLabel: 'YC profile',
+    profileUrl: 'https://www.ycombinator.com/companies/gigacatalyst',
     work: 'Founder & CEO at Gigacatalyst',
-    detail: 'YC Spring 2026. AI-embedded customization layers for enterprise B2B SaaS.',
-    interests: ['enterprise AI', 'B2B SaaS', 'YC'],
+    detail: 'YC Spring 2026 founder building an embedded AI customization layer that lets B2B SaaS customers create missing workflows inside existing products.',
+    interests: ['enterprise AI', 'B2B SaaS', 'product customization', 'YC'],
     relationship: 48,
     stage: 'friendly',
+    links: [
+      {
+        label: 'YC',
+        url: 'https://www.ycombinator.com/companies/gigacatalyst',
+        detail: 'Gigacatalyst company profile and founder bio.',
+      },
+      {
+        label: 'Personal site',
+        url: 'https://nmn.gl/',
+        detail: 'Personal site and writing archive.',
+      },
+      {
+        label: 'Company',
+        url: 'https://gigacatalyst.com/',
+        detail: 'Official Gigacatalyst product site.',
+      },
+      {
+        label: 'LinkedIn',
+        url: 'https://www.linkedin.com/in/namanyayg',
+        detail: 'Public professional profile.',
+      },
+    ],
   },
   {
     names: 'Wyatt Marshall',
     apartments: ['231'],
-    sourceLabel: 'View Profile',
+    sourceLabel: 'YC profile',
     profileUrl: 'https://www.ycombinator.com/companies/halluminate',
     work: 'Co-Founder & CTO at Halluminate',
-    detail: 'YC Summer 2025. Building security, firewalls, and guardrails for LLM agents.',
-    interests: ['LLM security', 'agent guardrails', 'YC'],
+    detail: 'YC Summer 2025 founder building realistic data, sandboxes, evals, and benchmarks for browser and computer-use AI agents.',
+    interests: ['agent evaluation', 'computer-use AI', 'RL environments', 'YC'],
     relationship: 45,
     stage: 'friendly',
+    links: [
+      {
+        label: 'YC',
+        url: 'https://www.ycombinator.com/companies/halluminate',
+        detail: 'Halluminate company profile and founder bio.',
+      },
+      {
+        label: 'Company',
+        url: 'https://halluminate.ai/',
+        detail: 'Official Halluminate site.',
+      },
+      {
+        label: 'LinkedIn',
+        url: 'https://www.linkedin.com/in/wyatt-marshall-a40797198',
+        detail: 'Public professional profile.',
+      },
+      {
+        label: 'Investor profile',
+        url: 'https://antigravity.capital/portfolio/halluminate',
+        detail: 'Portfolio page identifying Wyatt as CTO.',
+      },
+    ],
   },
   {
     names: 'Dhruv Roongta',
     apartments: ['215'],
-    sourceLabel: 'View Profile',
-    profileUrl: 'https://councils.forbes.com/profile/Dhruv-Roongta-CTO-%40-Dash-Slashy/cfc7e562-6b0a-444e-85f2-35b7e8de772c',
-    work: 'Co-Founder & CTO at Dash (Slashy)',
-    detail: 'YC Summer 2025. AI multi-agent software engineering automation platforms; ex-Groq.',
-    interests: ['software agents', 'engineering automation', 'AI infra'],
+    sourceLabel: 'YC profile',
+    profileUrl: 'https://www.ycombinator.com/companies/slashy',
+    work: 'Co-Founder at Slashy',
+    detail: 'YC Summer 2025 founder working on AI agents that connect to apps, understand cross-tool context, and take actions across knowledge-work workflows.',
+    interests: ['email agents', 'workflow automation', 'cross-tool context', 'YC'],
     relationship: 45,
     stage: 'friendly',
+    links: [
+      {
+        label: 'YC',
+        url: 'https://www.ycombinator.com/companies/slashy',
+        detail: 'Slashy company profile and founder listing.',
+      },
+      {
+        label: 'Company',
+        url: 'https://www.slashy.com/',
+        detail: 'Official Slashy site.',
+      },
+      {
+        label: 'Forbes',
+        url: 'https://councils.forbes.com/profile/Dhruv-Roongta-CTO-%40-Dash-Slashy/cfc7e562-6b0a-444e-85f2-35b7e8de772c',
+        detail: 'Professional profile for Dash / Slashy.',
+      },
+      {
+        label: 'Launch HN',
+        url: 'https://news.ycombinator.com/item?id=45129031',
+        detail: 'Launch discussion describing Slashy product direction.',
+      },
+    ],
   },
   {
     names: 'Shourya Vir Jain',
     apartments: ['213'],
-    sourceLabel: 'View Profile',
-    profileUrl: 'https://github.com/SveeJ',
+    sourceLabel: 'YC profile',
+    profileUrl: 'https://www.ycombinator.com/companies/ramain',
     work: 'Co-Founder & CEO at RamAIn',
-    detail: 'Backed by YC and General Catalyst. Automating UI workflows using NLP; ex-McKinsey.',
-    interests: ['NLP workflows', 'UI automation', 'startups'],
+    detail: 'YC Winter 2026 founder building enterprise computer-use agents that automate repetitive browser and desktop workflows through UI interaction.',
+    interests: ['computer-use agents', 'UI automation', 'enterprise workflows', 'YC'],
     relationship: 45,
     stage: 'friendly',
+    links: [
+      {
+        label: 'YC',
+        url: 'https://www.ycombinator.com/companies/ramain',
+        detail: 'RamAIn company profile and founder bio.',
+      },
+      {
+        label: 'Company',
+        url: 'https://ramain.ai/',
+        detail: 'Official RamAIn product site.',
+      },
+      {
+        label: 'Forbes',
+        url: 'https://councils.forbes.com/profile/Shourya-Vir-Jain-Co-founder-CEO-RamAIn/0c5aea3f-8da4-4f7d-8858-8a731ef56e1e',
+        detail: 'Professional profile identifying him as Co-founder & CEO.',
+      },
+      {
+        label: 'GitHub',
+        url: 'https://github.com/SveeJ',
+        detail: 'Public GitHub profile from the original dataset.',
+      },
+    ],
   },
   {
     names: 'Alisa Wu',
     apartments: ['343', '754'],
-    sourceLabel: 'View Profile',
-    profileUrl: 'https://www.forbes.com/councils/forbesbusinesscouncil/2026/02/19/storytelling-as-a-moat-in-a-commoditized-world/',
+    sourceLabel: 'YC profile',
+    profileUrl: 'https://www.ycombinator.com/companies/bluma',
     work: 'Co-Founder at Bluma',
-    detail: 'Recent YC cohort. Generative AI platform for user-generated video content and brand ad placements.',
-    interests: ['generative video', 'brand storytelling', 'YC'],
+    detail: 'YC Fall 2025 founder building an AI short-form content engine for cloning, templating, and scaling organic and paid video ads.',
+    interests: ['short-form video', 'AI UGC', 'marketing automation', 'YC'],
     relationship: 43,
     stage: 'friendly',
+    links: [
+      {
+        label: 'YC',
+        url: 'https://www.ycombinator.com/companies/bluma',
+        detail: 'Bluma company profile and founder bio.',
+      },
+      {
+        label: 'Company',
+        url: 'https://www.getbluma.com/',
+        detail: 'Official Bluma product site.',
+      },
+      {
+        label: 'LinkedIn',
+        url: 'https://www.linkedin.com/in/wu-alisa',
+        detail: 'Public professional profile.',
+      },
+      {
+        label: 'YC launch',
+        url: 'https://www.ycombinator.com/launches/Osw-bluma-the-ai-short-form-content-engine',
+        detail: 'Launch post with product and team context.',
+      },
+      {
+        label: 'Forbes article',
+        url: 'https://www.forbes.com/councils/forbesbusinesscouncil/2026/02/19/storytelling-as-a-moat-in-a-commoditized-world/',
+        detail: 'Article source from the original dataset.',
+      },
+    ],
   },
   {
     names: 'Milind Sagaram',
     apartments: ['261'],
-    sourceLabel: 'Search: Milind Sagaram',
-    work: 'Co-Founder & CEO at Articulate',
-    detail: 'Generative AI engineered to parse architectural and structural engineering construction blueprints.',
-    interests: ['construction AI', 'blueprints', 'architecture'],
+    sourceLabel: 'YC profile',
+    profileUrl: 'https://www.ycombinator.com/companies/helonic',
+    work: 'Founder at Articulate / Helonic',
+    detail: 'YC Fall 2025 founder building AI construction drawing analysis to detect clashes, callouts, discrepancies, and draft RFIs before field rework.',
+    interests: ['construction AI', 'drawing analysis', 'RFIs', 'YC'],
     relationship: 38,
+    links: [
+      {
+        label: 'YC',
+        url: 'https://www.ycombinator.com/companies/helonic',
+        detail: 'Helonic / Articulate company profile and founder bio.',
+      },
+      {
+        label: 'Company',
+        url: 'https://helonic.com/',
+        detail: 'Official Helonic product site.',
+      },
+      {
+        label: 'Personal site',
+        url: 'https://www.milindsagaram.com/',
+        detail: 'Personal site and background.',
+      },
+      {
+        label: 'LinkedIn',
+        url: 'https://www.linkedin.com/in/milind-sagaram',
+        detail: 'Public professional profile.',
+      },
+      {
+        label: 'GitHub',
+        url: 'https://github.com/milinds2403',
+        detail: 'Public GitHub profile.',
+      },
+    ],
   },
   {
     names: 'Kimia Koochakzadeh-Yazdi',
@@ -454,6 +605,7 @@ export const residentProfiles: ResidentProfile[] = residentSeeds.flatMap((seed) 
     interests: seed.interests,
     sourceLabel: seed.sourceLabel,
     profileUrl: seed.profileUrl,
+    links: seed.links,
     dataFilled: true,
   })),
 )
