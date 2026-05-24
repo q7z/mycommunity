@@ -12,7 +12,6 @@ import {
   MessageCircle,
   Route,
   Search,
-  ShieldCheck,
   UserPlus,
   Users,
   X,
@@ -997,15 +996,6 @@ function App() {
             })}
           </article>
 
-          <article className="insight-panel privacy-panel">
-            <div className="panel-title">
-              <ShieldCheck size={17} aria-hidden="true" />
-              <span>Privacy Posture</span>
-            </div>
-            <p>
-              The building map is separate from the resident memory layer. Keep real names, notes, and relationship history consented, exportable, and easy to delete.
-            </p>
-          </article>
         </section>
 
         <section className="plan-panel">
