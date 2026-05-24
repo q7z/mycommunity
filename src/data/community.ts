@@ -594,6 +594,34 @@ const residentSeeds: ResidentSeed[] = [
   },
 ]
 
+function sourceSearchQuery(sourceLabel: string, names: string) {
+  return sourceLabel.replace(/^Search:\s*/i, '').trim() || names
+}
+
+function sourceLinksForSeed(seed: ResidentSeed): ProfileLink[] {
+  if (seed.links?.length) return seed.links
+
+  if (seed.profileUrl) {
+    return [
+      {
+        label: seed.sourceLabel,
+        url: seed.profileUrl,
+        detail: `Public profile source for ${seed.names}.`,
+      },
+    ]
+  }
+
+  const query = sourceSearchQuery(seed.sourceLabel, seed.names)
+
+  return [
+    {
+      label: 'Search',
+      url: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+      detail: `Search public results for ${query}.`,
+    },
+  ]
+}
+
 export const residentProfiles: ResidentProfile[] = residentSeeds.flatMap((seed) =>
   seed.apartments.map((unitLabel) => ({
     unitId: unitIdsByApartment[unitLabel],
@@ -611,7 +639,7 @@ export const residentProfiles: ResidentProfile[] = residentSeeds.flatMap((seed) 
     sourceLabel: seed.sourceLabel,
     profileUrl: seed.profileUrl,
     imageUrl: seed.imageUrl,
-    links: seed.links,
+    links: sourceLinksForSeed(seed),
     dataFilled: true,
   })),
 )
