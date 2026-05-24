@@ -1,11 +1,7 @@
 import {
   Bell,
-  BriefcaseBusiness,
   Building2,
-  CalendarDays,
-  Coffee,
   ExternalLink,
-  HeartHandshake,
   Home,
   Lightbulb,
   MapPin,
@@ -106,13 +102,6 @@ const filterLabels: Record<FilterMode, string> = {
   all: 'All',
   friends: 'People',
   available: 'Open',
-}
-
-const stageLabels: Record<string, string> = {
-  new: 'New',
-  friendly: 'Friendly',
-  close: 'Close',
-  host: 'Host',
 }
 
 const emptyResidentForm: ResidentForm = {
@@ -240,7 +229,7 @@ function App() {
   const [query, setQuery] = useState('')
   const [filterMode, setFilterMode] = useState<FilterMode>('all')
   const [zoom, setZoom] = useState(1)
-  const [relationshipBoosts, setRelationshipBoosts] = useState<Record<string, number>>(() =>
+  const [relationshipBoosts] = useState<Record<string, number>>(() =>
     readStoredJson('landing.relationshipBoosts', {}),
   )
   const [homeUnitId, setHomeUnitId] = useState<string | null>(() => localStorage.getItem('landing.homeUnitId'))
@@ -321,9 +310,6 @@ function App() {
   const selectedResident = selectedUnit ? residentsByUnit.get(selectedUnit.id) : undefined
   const selectedAvailability = selectedUnit ? availableByUnit.get(selectedUnit.id) : undefined
   const selectedFloorPlan = selectedAvailability ? floorPlanById.get(selectedAvailability.floorPlanId) : undefined
-  const selectedScore = selectedResident
-    ? Math.min(100, selectedResident.relationship + (relationshipBoosts[selectedResident.unitId] ?? 0))
-    : 0
   const homeUnit = homeUnitId
     ? mapData?.floors.flatMap((floor) => floor.units).find((unit) => unit.id === homeUnitId)
     : null
@@ -352,15 +338,6 @@ function App() {
     () => new Set(unitSearchMatches.map((match) => match.unit.id)),
     [unitSearchMatches],
   )
-
-  const visibleResidents = useMemo(() => {
-    return allResidents
-      .map((profile) => ({
-        ...profile,
-        adjustedRelationship: Math.min(100, profile.relationship + (relationshipBoosts[profile.unitId] ?? 0)),
-      }))
-      .sort((a, b) => b.adjustedRelationship - a.adjustedRelationship)
-  }, [allResidents, relationshipBoosts])
 
   const introSuggestions = useMemo(() => {
     if (!selectedResident) return []
@@ -551,21 +528,6 @@ function App() {
     setSelectedUnitId(firstResident?.id ?? firstAvailable?.id ?? floor?.units[0]?.id ?? selectedUnitId)
     setDrawerOpen(false)
     setResidentFormOpen(false)
-  }
-
-  function logTouch(unitId: string, amount: number) {
-    setRelationshipBoosts((current) => ({ ...current, [unitId]: Math.min(24, (current[unitId] ?? 0) + amount) }))
-    const resident = residentsByUnit.get(unitId)
-    const label = amount >= 7 ? 'Help logged' : 'Coffee logged'
-    setTouchpoints((current) => [
-      {
-        id: `${Date.now()}-${unitId}`,
-        unitId,
-        label,
-        detail: resident ? `${resident.names} relationship memory updated.` : 'Apartment note updated.',
-      },
-      ...current,
-    ].slice(0, 6))
   }
 
   function selectResidentUnit(unitId: string) {
@@ -1042,51 +1004,20 @@ function App() {
             {selectedResident ? (
               <>
                 <div className="profile-header">
-                  <div className={`avatar tone-${getRelationshipTone(selectedScore)}`}>{getInitials(selectedResident.names)}</div>
+                  <div className="avatar">{getInitials(selectedResident.names)}</div>
                   <div>
                     <h3>{selectedResident.names}</h3>
-                    <p>{stageLabels[selectedResident.stage]}</p>
+                    <p>{selectedResident.work}</p>
                   </div>
                 </div>
-
-                <div className="relationship-meter">
-                  <div>
-                    <span>Relationship</span>
-                    <strong>{selectedScore}%</strong>
-                  </div>
-                  <progress max="100" value={selectedScore} />
-                </div>
-
-                <dl className="profile-facts">
-                  <div>
-                    <dt><BriefcaseBusiness size={15} aria-hidden="true" /> Work</dt>
-                    <dd>{selectedResident.work}</dd>
-                  </div>
-                  <div>
-                    <dt><CalendarDays size={15} aria-hidden="true" /> Last touch</dt>
-                    <dd>{selectedResident.lastTouch}</dd>
-                  </div>
-                  <div>
-                    <dt><MessageCircle size={15} aria-hidden="true" /> Best channel</dt>
-                    <dd>{selectedResident.preferredContact}</dd>
-                  </div>
-                  {(selectedResident.profileUrl || selectedResident.sourceLabel) && (
-                    <div>
-                      <dt><ExternalLink size={15} aria-hidden="true" /> Source</dt>
-                      <dd>
-                        {selectedResident.profileUrl ? (
-                          <a href={selectedResident.profileUrl} target="_blank" rel="noreferrer">
-                            {selectedResident.sourceLabel ?? 'View profile'}
-                          </a>
-                        ) : (
-                          selectedResident.sourceLabel
-                        )}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
 
                 <p className="profile-note">{selectedResident.note}</p>
+
+                <div className="tag-list">
+                  {selectedResident.interests.map((interest) => (
+                    <span key={interest}>{interest}</span>
+                  ))}
+                </div>
 
                 {selectedResident.links?.length ? (
                   <section className="drawer-section research-links" aria-label="Founder research links">
@@ -1107,51 +1038,6 @@ function App() {
                     </div>
                   </section>
                 ) : null}
-
-                <div className="tag-list">
-                  {selectedResident.interests.map((interest) => (
-                    <span key={interest}>{interest}</span>
-                  ))}
-                </div>
-
-                <div className="next-move">
-                  <span>Next move</span>
-                  <strong>{selectedResident.nextMove}</strong>
-                </div>
-
-                <div className="action-row">
-                  <button type="button" onClick={() => logTouch(selectedResident.unitId, 5)}>
-                    <Coffee size={16} aria-hidden="true" />
-                    Coffee
-                  </button>
-                  <button type="button" onClick={() => logTouch(selectedResident.unitId, 7)}>
-                    <HeartHandshake size={16} aria-hidden="true" />
-                    Helped
-                  </button>
-                </div>
-
-                <section className="drawer-section">
-                  <div className="panel-title">
-                    <UserPlus size={17} aria-hidden="true" />
-                    <span>Intro Ideas</span>
-                  </div>
-                  {introSuggestions.map((profile) => (
-                    <button
-                      className="intro-row"
-                      key={profile.unitId}
-                      type="button"
-                      onClick={() => selectResidentUnit(profile.unitId)}
-                    >
-                      <span className={`mini-avatar tone-${getRelationshipTone(profile.relationship)}`}>
-                        {getInitials(profile.names)}
-                      </span>
-                      <span>
-                        <strong>{profile.names}</strong>
-                        <small>{profile.reason}</small>
-                      </span>
-                    </button>
-                  ))}
-                </section>
               </>
             ) : (
               <div className="empty-profile">
@@ -1234,28 +1120,6 @@ function App() {
               </div>
             )}
 
-            <section className="drawer-section">
-              <div className="panel-title">
-                <Users size={17} aria-hidden="true" />
-                <span>Warmest Ties</span>
-              </div>
-              {visibleResidents.slice(0, 4).map((profile) => (
-                <button
-                  className={profile.unitId === selectedUnitId ? 'connection-row active' : 'connection-row'}
-                  key={profile.unitId}
-                  type="button"
-                  onClick={() => selectResidentUnit(profile.unitId)}
-                >
-                  <span className={`mini-avatar tone-${getRelationshipTone(profile.adjustedRelationship)}`}>
-                    {getInitials(profile.names)}
-                  </span>
-                  <span>
-                    <strong>{profile.names}</strong>
-                    <small>Apt {profile.unitLabel} · {profile.adjustedRelationship}%</small>
-                  </span>
-                </button>
-              ))}
-            </section>
           </aside>
         </>
       )}
