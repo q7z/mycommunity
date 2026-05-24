@@ -756,6 +756,19 @@ h3 {
   background: #f5f8ff;
 }
 
+.link-favicon {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  object-fit: contain;
+}
+
+.link-favicon-fallback {
+  color: #1f4fb8;
+  font-size: 0.68rem;
+  font-weight: 950;
+}
+
 .tag-list {
   display: flex;
   flex-wrap: wrap;

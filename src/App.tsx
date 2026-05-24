@@ -1,14 +1,11 @@
 import {
   Bell,
   Building2,
-  Globe,
   Home,
   Lightbulb,
   MapPin,
   MessageCircle,
-  Newspaper,
   Route,
-  Rocket,
   Search,
   UserPlus,
   Users,
@@ -17,7 +14,7 @@ import {
 import { type FormEvent, type PointerEvent, type WheelEvent, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import { buildPlan, residentProfiles, starterTouchpoints } from './data/community'
-import type { ResidentProfile } from './data/community'
+import type { ProfileLink, ResidentProfile } from './data/community'
 import { unitNumbersById } from './data/unitNumbers'
 
 type MapUnit = {
@@ -180,14 +177,52 @@ function isContactTouchpoint(touchpoint: Touchpoint) {
   return touchpoint.label === 'Coffee logged' || touchpoint.label === 'Help logged'
 }
 
-function profileLinkIcon(label: string) {
-  const normalized = label.toLowerCase()
+function profileLinkFaviconUrl(url: string) {
+  try {
+    const { origin } = new URL(url)
+    return `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(origin)}&sz=64`
+  } catch {
+    return ''
+  }
+}
 
-  if (normalized.includes('company')) return <Building2 size={18} aria-hidden="true" />
-  if (normalized.includes('launch')) return <Rocket size={18} aria-hidden="true" />
-  if (normalized.includes('forbes') || normalized.includes('investor')) return <Newspaper size={18} aria-hidden="true" />
+function profileLinkFallback(label: string) {
+  return label
+    .split(/\s+/)
+    .map((word) => word[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+}
 
-  return <Globe size={18} aria-hidden="true" />
+function ProfileLinkButton({ link, unitId }: { link: ProfileLink; unitId: string }) {
+  const [iconFailed, setIconFailed] = useState(false)
+  const iconUrl = profileLinkFaviconUrl(link.url)
+  const label = `${link.label}: ${link.detail}`
+
+  return (
+    <a
+      aria-label={label}
+      href={link.url}
+      key={`${unitId}-${link.url}`}
+      target="_blank"
+      title={label}
+      rel="noreferrer"
+    >
+      {iconUrl && !iconFailed ? (
+        <img
+          alt=""
+          aria-hidden="true"
+          className="link-favicon"
+          loading="lazy"
+          onError={() => setIconFailed(true)}
+          src={iconUrl}
+        />
+      ) : (
+        <span className="link-favicon-fallback" aria-hidden="true">{profileLinkFallback(link.label)}</span>
+      )}
+    </a>
+  )
 }
 
 function isUnitSearchMatch(
@@ -1035,16 +1070,11 @@ function App() {
                   <section className="research-links" aria-label="Profile links">
                     <div className="research-link-grid">
                       {selectedResident.links.map((link) => (
-                        <a
-                          aria-label={`${link.label}: ${link.detail}`}
-                          href={link.url}
+                        <ProfileLinkButton
                           key={`${selectedResident.unitId}-${link.url}`}
-                          target="_blank"
-                          title={`${link.label}: ${link.detail}`}
-                          rel="noreferrer"
-                        >
-                          {profileLinkIcon(link.label)}
-                        </a>
+                          link={link}
+                          unitId={selectedResident.unitId}
+                        />
                       ))}
                     </div>
                   </section>
