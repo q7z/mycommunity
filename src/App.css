@@ -729,21 +729,24 @@ h3 {
 }
 
 .research-links {
-  margin-bottom: 14px;
+  margin: 12px 0 14px;
 }
 
 .research-link-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .research-link-grid a {
   border: 1px solid var(--line);
   border-radius: 8px;
-  display: grid;
-  gap: 4px;
-  padding: 10px;
-  color: inherit;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1f4fb8;
   background: #fbfcff;
   text-decoration: none;
 }
@@ -751,21 +754,6 @@ h3 {
 .research-link-grid a:hover {
   border-color: rgba(47, 98, 213, 0.34);
   background: #f5f8ff;
-}
-
-.research-link-grid strong {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #1f4fb8;
-  font-size: 0.8rem;
-}
-
-.research-link-grid span {
-  color: #596174;
-  font-size: 0.76rem;
-  font-weight: 650;
-  line-height: 1.35;
 }
 
 .tag-list {

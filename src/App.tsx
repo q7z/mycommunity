@@ -1,12 +1,14 @@
 import {
   Bell,
   Building2,
-  ExternalLink,
+  Globe,
   Home,
   Lightbulb,
   MapPin,
   MessageCircle,
+  Newspaper,
   Route,
+  Rocket,
   Search,
   UserPlus,
   Users,
@@ -176,6 +178,16 @@ function getPercent(part: number, total: number) {
 
 function isContactTouchpoint(touchpoint: Touchpoint) {
   return touchpoint.label === 'Coffee logged' || touchpoint.label === 'Help logged'
+}
+
+function profileLinkIcon(label: string) {
+  const normalized = label.toLowerCase()
+
+  if (normalized.includes('company')) return <Building2 size={18} aria-hidden="true" />
+  if (normalized.includes('launch')) return <Rocket size={18} aria-hidden="true" />
+  if (normalized.includes('forbes') || normalized.includes('investor')) return <Newspaper size={18} aria-hidden="true" />
+
+  return <Globe size={18} aria-hidden="true" />
 }
 
 function isUnitSearchMatch(
@@ -1020,19 +1032,18 @@ function App() {
                 </div>
 
                 {selectedResident.links?.length ? (
-                  <section className="drawer-section research-links" aria-label="Founder research links">
-                    <div className="panel-title">
-                      <ExternalLink size={17} aria-hidden="true" />
-                      <span>Research Links</span>
-                    </div>
+                  <section className="research-links" aria-label="Profile links">
                     <div className="research-link-grid">
                       {selectedResident.links.map((link) => (
-                        <a href={link.url} key={`${selectedResident.unitId}-${link.url}`} target="_blank" rel="noreferrer">
-                          <strong>
-                            {link.label}
-                            <ExternalLink size={13} aria-hidden="true" />
-                          </strong>
-                          <span>{link.detail}</span>
+                        <a
+                          aria-label={`${link.label}: ${link.detail}`}
+                          href={link.url}
+                          key={`${selectedResident.unitId}-${link.url}`}
+                          target="_blank"
+                          title={`${link.label}: ${link.detail}`}
+                          rel="noreferrer"
+                        >
+                          {profileLinkIcon(link.label)}
                         </a>
                       ))}
                     </div>
