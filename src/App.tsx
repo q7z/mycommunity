@@ -83,6 +83,11 @@ type LandingMapData = {
 
 type FilterMode = 'all' | 'friends' | 'available'
 
+type UnitSearchMatch = {
+  floor: Floor
+  unit: MapUnit
+}
+
 type Touchpoint = {
   id: string
   unitId: string
@@ -183,6 +188,49 @@ function getPercent(part: number, total: number) {
 
 function isContactTouchpoint(touchpoint: Touchpoint) {
   return touchpoint.label === 'Coffee logged' || touchpoint.label === 'Help logged'
+}
+
+function isUnitSearchMatch(
+  floor: Floor,
+  unit: MapUnit,
+  resident: ResidentProfile | undefined,
+  availability: AvailableUnit | undefined,
+  filterMode: FilterMode,
+  searchText: string,
+) {
+  const matchesFilter =
+    filterMode === 'all'
+    || (filterMode === 'friends' && Boolean(resident))
+    || (filterMode === 'available' && Boolean(availability))
+
+  if (!matchesFilter) return false
+  if (!searchText) return true
+
+  const haystack = [
+    unit.id,
+    unit.unitNumber,
+    unit.displayUnitNumber,
+    unitNumbersById[unit.id],
+    floor.label,
+    floor.shortLabel,
+    resident?.names,
+    resident?.work,
+    resident?.stage,
+    resident?.sourceLabel,
+    resident?.unitLabel,
+    resident?.note,
+    resident?.nextMove,
+    resident?.preferredContact,
+    ...(resident?.interests ?? []),
+    availability?.displayUnitNumber,
+    availability?.displayArea,
+    availability?.displayPrice,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+
+  return haystack.includes(searchText)
 }
 
 function App() {
@@ -286,43 +334,24 @@ function App() {
 
   const searchText = query.trim().toLowerCase()
 
-  const matchingUnitIds = useMemo(() => {
-    if (!mapData) return new Set<string>()
-    if (!searchText && filterMode === 'all') return new Set(mapData.floors.flatMap((floor) => floor.units.map((unit) => unit.id)))
+  const unitSearchMatches = useMemo<UnitSearchMatch[]>(() => {
+    if (!mapData) return []
 
-    return new Set(
-      mapData.floors.flatMap((floor) =>
-        floor.units
-          .filter((unit) => {
-            const resident = residentsByUnit.get(unit.id)
-            const availability = availableByUnit.get(unit.id)
-            const matchesFilter =
-              filterMode === 'all'
-              || (filterMode === 'friends' && Boolean(resident))
-              || (filterMode === 'available' && Boolean(availability))
-            const haystack = [
-              unit.id,
-              unit.unitNumber,
-              unit.displayUnitNumber,
-              unitNumbersById[unit.id],
-              floor.label,
-              resident?.names,
-              resident?.work,
-              resident?.stage,
-              resident?.sourceLabel,
-              ...(resident?.interests ?? []),
-              availability?.displayUnitNumber,
-            ]
-              .filter(Boolean)
-              .join(' ')
-              .toLowerCase()
-
-            return matchesFilter && (!searchText || haystack.includes(searchText))
-          })
-          .map((unit) => unit.id),
-      ),
+    return mapData.floors.flatMap((floor) =>
+      floor.units
+        .filter((unit) => {
+          const resident = residentsByUnit.get(unit.id)
+          const availability = availableByUnit.get(unit.id)
+          return isUnitSearchMatch(floor, unit, resident, availability, filterMode, searchText)
+        })
+        .map((unit) => ({ floor, unit })),
     )
   }, [availableByUnit, filterMode, mapData, residentsByUnit, searchText])
+
+  const matchingUnitIds = useMemo(
+    () => new Set(unitSearchMatches.map((match) => match.unit.id)),
+    [unitSearchMatches],
+  )
 
   const visibleResidents = useMemo(() => {
     return allResidents
@@ -474,6 +503,45 @@ function App() {
   useEffect(() => {
     localStorage.setItem('landing.customResidents', JSON.stringify(customResidents))
   }, [customResidents])
+
+  function findFirstMatchingUnit(nextSearchText: string, nextFilterMode: FilterMode): UnitSearchMatch | null {
+    if (!mapData) return null
+
+    for (const floor of mapData.floors) {
+      for (const unit of floor.units) {
+        const resident = residentsByUnit.get(unit.id)
+        const availability = availableByUnit.get(unit.id)
+
+        if (isUnitSearchMatch(floor, unit, resident, availability, nextFilterMode, nextSearchText)) {
+          return { floor, unit }
+        }
+      }
+    }
+
+    return null
+  }
+
+  function moveToSearchMatch(nextSearchText: string, nextFilterMode: FilterMode) {
+    const firstMatch = findFirstMatchingUnit(nextSearchText, nextFilterMode)
+    if (!firstMatch) return
+
+    setActiveFloorId(firstMatch.floor.id)
+    setSelectedUnitId(firstMatch.unit.id)
+    setDrawerOpen(false)
+    setResidentFormOpen(false)
+  }
+
+  function handleSearchChange(value: string) {
+    setQuery(value)
+
+    const nextSearchText = value.trim().toLowerCase()
+    if (nextSearchText) moveToSearchMatch(nextSearchText, filterMode)
+  }
+
+  function handleFilterModeChange(mode: FilterMode) {
+    setFilterMode(mode)
+    if (searchText) moveToSearchMatch(searchText, mode)
+  }
 
   function selectFloor(floorId: string) {
     const floor = mapData?.floors.find((candidate) => candidate.id === floorId)
@@ -718,7 +786,7 @@ function App() {
             <Search size={17} aria-hidden="true" />
             <input
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => handleSearchChange(event.target.value)}
               placeholder="Search people, apartments, interests"
             />
           </label>
@@ -728,7 +796,7 @@ function App() {
                 className={mode === filterMode ? 'active' : ''}
                 key={mode}
                 type="button"
-                onClick={() => setFilterMode(mode)}
+                onClick={() => handleFilterModeChange(mode)}
               >
                 {filterLabels[mode]}
               </button>
